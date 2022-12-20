@@ -9,20 +9,20 @@ let id = 0
 Alpine.data('main', () => ({
     todos: [],
     newTodo: '',
-    titleBeforeEdit: null,
+    titleBeforeEdit: '',
     editedTodo: null,
     allDone: false,
     visibility: 'all',
     addTodo() {
         // @ts-ignore
-        if (this.newTodo) {
+        if (this.newTodo.trim()) {
             // @ts-ignore
-            this.todos.push({id: id++, completed: false, title: this.newTodo})
+            this.todos.push({ id: id++, completed: false, title: this.newTodo })
             this.newTodo = ''
         }
     },
     removeTodo(todo) {
-        let id = this.todos.findIndex((t) => t === todo)
+        let id = this.todos.indexOf(todo)
         this.todos.splice(id, 1)
     },
     editTodo(todo) {
@@ -30,13 +30,20 @@ Alpine.data('main', () => ({
         this.editedTodo = todo
     },
     doneEdit(todo) {
+        if (!this.editedTodo) {
+            return
+        }
         this.editedTodo = null
-        this.titleBeforeEdit = null
+        todo.title = todo.title.trim()
+        if (!todo.title) {
+            this.removeTodo(todo)
+        }
+        this.titleBeforeEdit = ''
     },
     cancelEdit(todo) {
         todo.title = this.titleBeforeEdit
         this.editedTodo = null
-        this.titleBeforeEdit = null
+        this.titleBeforeEdit = ''
     },
     removeCompleted() {
         let completedTodos = this.todos.filter((todo => todo.completed))
